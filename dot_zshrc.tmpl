@@ -7,6 +7,11 @@
 
 source ~/zsh-snaps/zsh-snap/znap.zsh
 
+{{- if eq .chezmoi.hostname "lhs" }}
+# source nix for TS setup so starship is available
+source /nix/setup-nix.sh
+{{- end}}
+
 # set prompt
 if type "starship" > /dev/null; then
     znap eval starship 'starship init zsh --print-full-init'
