@@ -10,6 +10,10 @@ source ~/zsh-snaps/zsh-snap/znap.zsh
 {{- if eq .chezmoi.hostname "lhs" }}
 # source nix for TS setup so starship is available
 source /nix/setup-nix.sh
+
+# export google credentials so gceproxy is not required
+export GOOGLE_APPLICATION_CREDENTIALS=$(tsgcloud-config)
+export GOOGLE_CLOUD_PROJECT=placeholder
 {{- end}}
 
 # set prompt
@@ -126,3 +130,15 @@ Linux)
     ;;
 esac
 
+{{- if eq .chezmoi.hostname "lhs" }}
+# BEGIN NEST CONFIG DO NOT EDIT
+if [ -f "/opt/ts/services/nest.ts_lang_python_virtualenv/sh/setup.sh" ]; then
+    . /opt/ts/services/nest.ts_lang_python_virtualenv/sh/setup.sh
+fi
+# END NEST CONFIG DO NOT EDIT
+
+autoload -Uz compinit
+compinit
+
+alias gm='git meta'
+{{- end}}
