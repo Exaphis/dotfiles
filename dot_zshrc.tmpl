@@ -93,11 +93,14 @@ function mkcd() {
   mkdir -p "$dir" && cd "$dir";
 }
 
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
 # home-specific plugins
 if [[ -v ZSH_HOME ]]; then
     znap source marlonrichert/zsh-autocomplete
     znap source zsh-users/zsh-syntax-highlighting
     zstyle ':autocomplete:*' min-input 1
+    zstyle ':autocomplete:*' fzf-completion yes
 fi
 
 # OS-specific commands
@@ -118,6 +121,14 @@ Darwin)
     # pyenv
     eval "$(pyenv init -)"
     alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
+
+    # codeql
+    export PATH="$HOME/bin/codeql:$PATH"
+
+    test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+    # android build tools and platform tools
+    export PATH="$HOME/Library/Android/sdk/build-tools/33.0.1:$HOME/Library/Android/sdk/platform-tools:$PATH"
     ;;
 Linux)
     alias ls='ls --color=auto'  # colorful ls
@@ -130,15 +141,3 @@ Linux)
     ;;
 esac
 
-{{- if eq .chezmoi.hostname "lhs" }}
-# BEGIN NEST CONFIG DO NOT EDIT
-if [ -f "/opt/ts/services/nest.ts_lang_python_virtualenv/sh/setup.sh" ]; then
-    . /opt/ts/services/nest.ts_lang_python_virtualenv/sh/setup.sh
-fi
-# END NEST CONFIG DO NOT EDIT
-
-autoload -Uz compinit
-compinit
-
-alias gm='git meta'
-{{- end}}
