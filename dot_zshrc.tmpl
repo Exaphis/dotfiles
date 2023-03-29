@@ -7,15 +7,6 @@
 
 source ~/zsh-snaps/zsh-snap/znap.zsh
 
-{{- if eq .chezmoi.hostname "lhs" }}
-# source nix for TS setup so starship is available
-source /nix/setup-nix.sh
-
-# export google credentials so gceproxy is not required
-export GOOGLE_APPLICATION_CREDENTIALS=$(tsgcloud-config)
-export GOOGLE_CLOUD_PROJECT=placeholder
-{{- end}}
-
 # set prompt
 if type "starship" > /dev/null; then
     znap eval starship 'starship init zsh --print-full-init'
@@ -70,7 +61,7 @@ alias vi='vim'
 # enable vi mode for the zsh line editor
 bindkey -v
 
-# prevent 0.4s delay before entering vi mode (https://old.reddit.com/r/vim/comments/60jl7h/zsh_vimode_no_delay_entering_normal_mode/(
+# prevent 0.4s delay before entering vi mode (https://old.reddit.com/r/vim/comments/60jl7h/zsh_vimode_no_delay_entering_normal_mode/)
 KEYTIMEOUT=1
 bindkey '^R' history-incremental-search-backward
 bindkey -v '^?' backward-delete-char
