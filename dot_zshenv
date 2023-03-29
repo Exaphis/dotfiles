@@ -30,6 +30,7 @@ Linux)
 esac
 
 # enable addons if on home system, disable if anywhere else
-if [[ -v ZSH_HOME ]]; then
+if (( ${+ZSH_HOME} )); then
     export VIM_ENABLE_ADDONS="yes"
+    export ENABLE_ZNAP="yes"
 fi
