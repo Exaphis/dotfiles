@@ -16,7 +16,14 @@ else
     {{ if eq .chezmoi.username "wuke" }}
         source /desco/local/share/git/contrib/completion/git-prompt.sh
         setopt PROMPT_SUBST
-        export PS1='%F{green}%n@$HOSTPROMPT%f:%F{blue}%~%f$(__git_ps1 " (%s)")%(?..%F{red})$%f '
+
+        export PROMPT='%t '                   # time
+        PROMPT+='%F{blue}$BASE_DIR:t%f${${BASE_DIR:+ }:-}'  # BASE_DIR
+        PROMPT+='%F{green}%n@$HOSTPROMPT%f'   # username@host
+        PROMPT+=':'
+        PROMPT+='%F{blue}%~%f'                # directory
+        PROMPT+='$(__git_ps1 " (%s)")'        # git info
+        PROMPT+='%(?..%F{red})$%f '           # colored end string
     {{ else }}
         export PS1="%F{green}%n@%m%f:%F{blue}%~%f%(?..%F{red})$%f "
     {{ end }}
@@ -96,11 +103,14 @@ function mkcd() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 {{ if eq .chezmoi.username "wuke" }}
-    if [ -n "${commands[fzf-share]}" ]; then
-        fzfshare="$( dirname $( dirname $( readlink ${commands[fzf-share]} )))/share/fzf"
-        source "${fzfshare}/key-bindings.zsh"
-        source "${fzfshare}/completion.zsh"
-    fi
+function zvm_after_init() {
+    fzfbase="/nix/profiles/wuke/default/bin/fzf-share"
+    fzfshare="$( dirname $( dirname $( readlink ${fzfbase} )))/share/fzf"
+    source "${fzfshare}/key-bindings.zsh"
+    source "${fzfshare}/completion.zsh"
+}
+
+source $HOME/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 {{ end }}
 
 
@@ -151,5 +161,9 @@ Linux)
 esac
 
 {{ if eq .chezmoi.username "wuke" }}
-    export PATH="$PATH:/prod/tools/python-devtools/bin/share"
+    export LOG_DEPRECATED_DATE_OFFSET=-20
+    export PATH="$PATH:/prod/tools/python-devtools/bin/share:$HOME/.local/bin"
+    alias tidygit='tidy-imports $(git diff HEAD --name-only | grep -e ".*py$")'
+    alias cd='cd -P'
+    alias xcp='xclip -selection clipboard'
 {{ end }}
