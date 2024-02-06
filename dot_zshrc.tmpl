@@ -162,7 +162,7 @@ esac
 
 {{ if eq .chezmoi.username "wuke" }}
     export LOG_DEPRECATED_DATE_OFFSET=-20
-    export PATH="$PATH:/prod/tools/python-devtools/bin/share:$HOME/.local/bin"
+    export PATH="$PATH:/prod/tools/python-devtools/bin/share:/prod/cas/bin:$HOME/.local/bin"
     alias tidygit='tidy-imports $(git diff HEAD --name-only | grep -e ".*py$")'
     alias cd='cd -P'
     alias xcp='xclip -selection clipboard'
