@@ -117,10 +117,7 @@ source $HOME/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 
 # home-specific plugins
 if (( ${+ZSH_HOME} )); then
-    znap source marlonrichert/zsh-autocomplete
     znap source zsh-users/zsh-syntax-highlighting
-    zstyle ':autocomplete:*' min-input 1
-    zstyle ':autocomplete:*' fzf-completion yes
 fi
 
 # OS-specific commands
