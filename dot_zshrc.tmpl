@@ -105,13 +105,14 @@ function mkcd() {
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 {{ if eq .chezmoi.username "wuke" }}
 function zvm_after_init() {
-    fzfbase="/nix/profiles/wuke/default/bin/fzf-share"
-    fzfshare="$( dirname $( dirname $( readlink ${fzfbase} )))/share/fzf"
-    source "${fzfshare}/key-bindings.zsh"
-    source "${fzfshare}/completion.zsh"
+    if command -v fzf-share >/dev/null; then
+        source "$(fzf-share)/key-bindings.zsh"
+        source "$(fzf-share)/completion.zsh"
+    fi
 }
 
 source $HOME/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+source $HOME/zsh/zsh-z/zsh-z.plugin.zsh
 {{ end }}
 
 
@@ -165,4 +166,21 @@ esac
     alias tidygit='tidy-imports $(git diff HEAD --name-only | grep -e ".*py$")'
     alias cd='cd -P'
     alias pbcopy='xclip -selection clipboard'
+    alias rel='/desco/group/sysdevops/bin/base_release'
+    alias nvitop='/codemill/wuke/envs/wuke311/bin/nvitop'
+    alias gst='git status'
+    alias gd='git diff'
+    alias podman='/desco/containers/bin/podman'
+    alias ls='eza'
+
+    alias base1='export BASE_DIR=/codemill/wuke/base1 && cd /codemill/wuke/base1'
+    alias base2='export BASE_DIR=/codemill/wuke/base2 && cd /codemill/wuke/base2'
+    alias base3='export BASE_DIR=/codemill/wuke/base3 && cd /codemill/wuke/base3'
+
+    function git-stash-except-test() {
+        git add **/tests
+        git stash push --keep-index -m "Stashing all changes except tests"
+    }
+
+    sshcd() { ssh -t "$@" "cd '$(pwd)'; zsh -l"; }
 {{ end }}
