@@ -144,7 +144,7 @@ if !empty($VIM_ENABLE_ADDONS)
     """"""""""
 
     call plug#begin('~/.vim/plugged')
-    Plug 'ycm-core/YouCompleteMe'
+    " Plug 'ycm-core/YouCompleteMe'
     Plug 'chriskempson/base16-vim'
     call plug#end()
 
@@ -163,8 +163,11 @@ if !empty($VIM_ENABLE_ADDONS)
     " Themes
     """""""""
 
-    let base16colorspace=256
-    colorscheme base16-bright
+    if exists('$BASE16_THEME')
+          \ && (!exists('g:colors_name') || g:colors_name != 'base16-$BASE16_THEME')
+        let base16colorspace=256
+        colorscheme base16-$BASE16_THEME
+    endif
 
     " Enable transparency
     hi Normal ctermbg=none
