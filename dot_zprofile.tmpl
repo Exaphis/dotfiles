@@ -10,3 +10,9 @@ Linux)
     ;;
 esac
 
+
+{{ if eq .chezmoi.username "wuke" }}
+# Added by Toolbox App
+export PATH="$PATH:/u/wuke/.local/share/JetBrains/Toolbox/scripts"
+{{ end }}
+

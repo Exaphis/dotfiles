@@ -15,7 +15,7 @@ def _get_implementation():
         if sys.platform.startswith('linux'):
             def _clip(arg):
                 p = Popen(['xclip', '-selection', 'clipboard'], stdin=PIPE)
-                p.communicate(arg)
+                p.communicate(arg.encode('utf-8'))
             _get_implementation.impls['linux'] = _clip
 
         elif sys.platform == 'darwin':
@@ -29,7 +29,7 @@ def _get_implementation():
             raise ImportError("Clip magic doesn't work on your platform: '{}'".format(sys.platform))
 
 
-    return _get_implementation['linux'] \
+    return _get_implementation.impls['linux'] \
             if sys.platform.startswith('linux') \
         else _get_implementation.impls[sys.platform]
 

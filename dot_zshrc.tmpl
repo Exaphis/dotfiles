@@ -15,10 +15,65 @@ if type "starship" > /dev/null; then
     znap eval starship 'starship init zsh --print-full-init'
 else
     {{ if eq .chezmoi.username "wuke" }}
+        # --- timing helpers ---------------------------------------------------------
+        # $EPOCHREALTIME gives a high-resolution, floating-point Unix timestamp.
+        zmodload zsh/datetime
+
+        # called just *before* the command is executed
+        preexec() {
+          _cmd_start=$EPOCHREALTIME
+        }
+
+        # called just *before* the next prompt is displayed
+        precmd() {
+          if [[ -n $_cmd_start ]]; then
+            local _elapsed=$(( EPOCHREALTIME - _cmd_start ))   # float seconds
+
+            # ── µs / ms  ──────────────────────────────────────
+            if (( _elapsed < 0.001 )); then                    # < 1 ms  ➜  µs
+              local us=$(( _elapsed * 1e6 ))
+              local dec=$(( us >= 100 ? 0 : us >= 10 ? 1 : 2 ))   #   ~3 sig-figs
+              LAST_CMD_TIME=$(printf "%.*fus " $dec $us)
+
+            elif (( _elapsed < 1 )); then                      # < 1 s   ➜  ms
+              local ms=$(( _elapsed * 1e3 ))
+              local dec=$(( ms >= 100 ? 0 : ms >= 10 ? 1 : 2 ))
+              LAST_CMD_TIME=$(printf "%.*fms " $dec $ms)
+
+            # ── pure seconds (< 1 min) ────────────────────────
+            elif (( _elapsed < 60 )); then
+              local dec=$(( _elapsed >= 10 ? 1 : 2 ))
+              LAST_CMD_TIME=$(printf "%.*fs " $dec $_elapsed)
+
+            # ── ≥ 60 s : work with integer seconds to avoid FP artefacts ──
+            else
+              local tot=${_elapsed%.*}                 # floor to integer seconds
+
+              if (( tot < 3600 )); then                # < 1 h  ->  mm ss
+                local m=$(( tot / 60 ))
+                local s=$(( tot % 60 ))
+                LAST_CMD_TIME=$(printf "%dm%02ds " $m $s)
+
+              elif (( tot < 86400 )); then             # < 1 d  ->  hh mm
+                local h=$(( tot / 3600 ))
+                local m=$(( (tot % 3600) / 60 ))
+                LAST_CMD_TIME=$(printf "%dh%02dm " $h $m)
+
+              else                                     # ≥ 1 d   ->  dd hh
+                local d=$(( tot / 86400 ))
+                local h=$(( (tot % 86400) / 3600 ))
+                LAST_CMD_TIME=$(printf "%dd%02dh " $d $h)
+              fi
+            fi
+          fi
+        }
+
+        # --- prompt -----------------------------------------------------------------
         source /desco/local/share/git/contrib/completion/git-prompt.sh
         setopt PROMPT_SUBST
 
         export PROMPT='%t '                   # time
+        PROMPT+='%F{yellow}${LAST_CMD_TIME:-}%f'            # last command wall time
         PROMPT+='%F{blue}$BASE_DIR:t%f${${BASE_DIR:+ }:-}'  # BASE_DIR
         PROMPT+='%F{green}%n@$HOSTPROMPT%f'   # username@host
         PROMPT+=':'
@@ -163,7 +218,8 @@ esac
 
 {{ if eq .chezmoi.username "wuke" }}
     export LOG_DEPRECATED_DATE_OFFSET=-20
-    export PATH="$PATH:/prod/tools/python-devtools/bin/share:/prod/cas/bin:$HOME/.local/bin"
+    export DOOMGITCONFIG=/etc/gitconfig
+    export PATH="$PATH:/prod/tools/python-devtools/bin/share:/prod/cas/bin:/desco/systems/k8s/bin:$HOME/.config/emacs/bin:/prod/tools/infra/nodejs/node/bin:/prod/gaitech/tools:/prod/tools/infra/nodejs/node_modules/bin:/$HOME/.local/bin"
 
     alias tidygit='tidy-imports $(git diff HEAD --name-only | grep -e ".*py$")'
     alias cd='cd -P'
@@ -174,6 +230,7 @@ esac
     alias gd='git diff'
     alias podman='/desco/containers/bin/podman'
     alias ls='eza'
+    alias gcm='git checkout $(git symbolic-ref refs/remotes/origin/HEAD | sed "s@^refs/remotes/origin/@@")'
 
     alias base1='export BASE_DIR=/codemill/wuke/base1 && cd /codemill/wuke/base1'
     alias base2='export BASE_DIR=/codemill/wuke/base2 && cd /codemill/wuke/base2'
