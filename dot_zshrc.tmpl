@@ -176,6 +176,11 @@ if (( ${+ZSH_HOME} )); then
     znap source zsh-users/zsh-syntax-highlighting
 fi
 
+# DOOM emacs
+if [ -d "$HOME/.config/emacs/bin" ]; then
+    PATH="$HOME/.config/emacs/bin:$PATH"
+fi
+
 # OS-specific commands
 case `uname` in
 Darwin)
@@ -219,7 +224,7 @@ esac
 {{ if eq .chezmoi.username "wuke" }}
     export LOG_DEPRECATED_DATE_OFFSET=-20
     export DOOMGITCONFIG=/etc/gitconfig
-    export PATH="$PATH:/prod/tools/python-devtools/bin/share:/prod/cas/bin:/desco/systems/k8s/bin:$HOME/.config/emacs/bin:/prod/tools/infra/nodejs/node/bin:/prod/gaitech/tools:/prod/tools/infra/nodejs/node_modules/bin:/$HOME/.local/bin"
+    export PATH="$PATH:/prod/tools/python-devtools/bin/share:/prod/cas/bin:/desco/systems/k8s/bin:/prod/tools/infra/nodejs/node/bin:/prod/gaitech/tools:/prod/tools/infra/nodejs/node_modules/bin:/$HOME/.local/bin"
 
     alias tidygit='tidy-imports $(git diff HEAD --name-only | grep -e ".*py$")'
     alias cd='cd -P'
