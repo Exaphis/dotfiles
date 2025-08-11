@@ -35,7 +35,11 @@ def _get_implementation():
 
 
 def _copy_to_clipboard(arg):
-    arg = str(globals().get(arg) or arg)
+    try:
+        arg = str(globals()[arg])
+    except Exception:
+        arg = str(arg)
+
     _get_implementation()(arg)
     print('Copied to clipboard!')
 
